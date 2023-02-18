@@ -11,21 +11,39 @@ import (
 type Context struct {
 	request        *http.Request
 	responseWriter http.ResponseWriter
-	ctx            context.Context
-	handler        ControllerHandler
+	//ctx            context.Context
 	// 是否超时
 	hasTimeout bool
 	// 写保护机制
 	writerMux *sync.Mutex
+
+	handlers []ControllerHandler
+	index    int
 }
 
 func NewContext(w http.ResponseWriter, r *http.Request) *Context {
 	return &Context{
 		request:        r,
 		responseWriter: w,
-		ctx:            r.Context(),
-		writerMux:      &sync.Mutex{},
+		//ctx:            r.Context(),
+		writerMux: &sync.Mutex{},
 	}
+}
+
+// 为context设置handlers
+func (ctx *Context) setHandlers(handlers []ControllerHandler) {
+	ctx.handlers = handlers
+}
+
+// 核心函数，调用context的下一个函数
+func (ctx *Context) next() error {
+	ctx.index++
+	if ctx.index < len(ctx.handlers) {
+		if err := ctx.handlers[ctx.index](ctx); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (ctx *Context) WriterMux() *sync.Mutex {

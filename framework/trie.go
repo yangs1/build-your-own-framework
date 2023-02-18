@@ -12,8 +12,10 @@ type Tree struct {
 type node struct {
 	isLast  bool   // 该节点是否能成为一个独立的uri, 是否自身就是一个终极节点
 	segment string // uri中的字符串
-	handler ControllerHandler
 	childs  []*node
+
+	handler     ControllerHandler
+	middlewares []ControllerHandler
 }
 
 func newNode() *node {
@@ -29,6 +31,11 @@ func NewTree() *Tree {
 // 判断一个segment是否是通用segment，即以:开头
 func isWildSegment(segment string) bool {
 	return strings.HasPrefix(segment, ":")
+}
+
+// 设置中间件
+func (n *node) SetMiddlewares(middlewares []ControllerHandler) {
+	n.middlewares = middlewares
 }
 
 // 过滤下一层满足segment规则的子节点
@@ -97,7 +104,7 @@ func (n *node) matchNode(url string) *node {
 /:user/name
 /:user/name/:age (冲突)
 */
-func (tree *Tree) AddRouter(uri string, handler ControllerHandler) error {
+func (tree *Tree) AddRouter(uri string, handler ControllerHandler, middlewares []ControllerHandler) error {
 	n := tree.root
 	if n.matchNode(uri) != nil {
 		return errors.New("route exist: " + uri)
@@ -134,6 +141,7 @@ func (tree *Tree) AddRouter(uri string, handler ControllerHandler) error {
 			if isLast {
 				cnode.isLast = true
 				cnode.handler = handler
+				cnode.middlewares = middlewares
 			}
 			n.childs = append(n.childs, cnode)
 			objNode = cnode
