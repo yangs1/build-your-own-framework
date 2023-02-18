@@ -154,11 +154,11 @@ func (tree *Tree) AddRouter(uri string, handler ControllerHandler, middlewares [
 }
 
 // 匹配uri
-func (tree *Tree) FindHandler(url string) ControllerHandler {
+func (tree *Tree) FindHandler(url string) *node {
 	matchNode := tree.root.matchNode(url)
 
 	if matchNode == nil {
 		return nil
 	}
-	return matchNode.handler
+	return matchNode
 }

@@ -27,6 +27,7 @@ func NewContext(w http.ResponseWriter, r *http.Request) *Context {
 		responseWriter: w,
 		//ctx:            r.Context(),
 		writerMux: &sync.Mutex{},
+		index:     -1,
 	}
 }
 
@@ -36,7 +37,7 @@ func (ctx *Context) setHandlers(handlers []ControllerHandler) {
 }
 
 // 核心函数，调用context的下一个函数
-func (ctx *Context) next() error {
+func (ctx *Context) Next() error {
 	ctx.index++
 	if ctx.index < len(ctx.handlers) {
 		if err := ctx.handlers[ctx.index](ctx); err != nil {

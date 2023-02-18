@@ -15,11 +15,14 @@ func registerRouter(core *framework.Core) {
 
 	dgroup := bgourp.Group("ddd")
 	dgroup.Use(func(c *framework.Context) error {
+		c.Next()
 		fmt.Println("int /ccc/ddd")
 		return nil
 	})
 
 	dgroup.Get("f", func(c *framework.Context) error {
+		fmt.Println("int /ccc/ddd/f")
+
 		return c.Json(200, "/ccc/ddd/fff")
 	})
 }

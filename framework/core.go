@@ -21,22 +21,27 @@ func (c *Core) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println("core.serveHTTP")
 	ctx := NewContext(w, r)
 
-	router := c.FindRouteByRequest(r)
+	routeNode := c.FindRouteByRequest(r)
 
-	if router == nil {
+	if routeNode == nil {
 		// 如果没有找到，这里打印日志
 		ctx.Json(404, "not found")
 		return
 	}
 
+	handler := routeNode.handler
+	middlewares := routeNode.middlewares
+
+	ctx.setHandlers(append(middlewares, handler))
+
 	// 调用路由函数，如果返回err 代表存在内部错误，返回500状态码
-	if err := router(ctx); err != nil {
+	if err := ctx.Next(); err != nil {
 		ctx.Json(500, "inner error")
 		return
 	}
 }
 
-func (c *Core) FindRouteByRequest(request *http.Request) ControllerHandler {
+func (c *Core) FindRouteByRequest(request *http.Request) *node {
 	url := request.URL.Path
 	method := request.Method
 
