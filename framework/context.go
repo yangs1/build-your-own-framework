@@ -59,12 +59,28 @@ func (ctx *Context) GetResponse() http.ResponseWriter {
 	return ctx.responseWriter
 }
 
-func (ctx *Context) SetHashTimeOut() {
+func (ctx *Context) SetHasTimeout() {
 	ctx.hasTimeout = true
 }
 
 func (ctx *Context) HasTimeout() bool {
 	return ctx.hasTimeout
+}
+
+func (ctx Context) Json(status int, obj interface{}) error {
+	if ctx.HasTimeout() {
+		//todo
+		return nil
+	}
+	ctx.responseWriter.Header().Set("Content-Type", "application/json")
+	ctx.responseWriter.WriteHeader(status)
+	byt, err := json.Marshal(obj)
+	if err != nil {
+		ctx.responseWriter.WriteHeader(500)
+		return err
+	}
+	ctx.responseWriter.Write(byt)
+	return nil
 }
 
 func (ctx *Context) BaseContext() context.Context {
@@ -85,19 +101,4 @@ func (ctx *Context) Err() error {
 
 func (ctx *Context) Value(key interface{}) interface{} {
 	return ctx.BaseContext().Value(key)
-}
-
-func (ctx Context) Json(status int, obj interface{}) error {
-	if ctx.HasTimeout() {
-		return nil
-	}
-	ctx.responseWriter.Header().Set("Content-Type", "application/json")
-	ctx.responseWriter.WriteHeader(status)
-	byt, err := json.Marshal(obj)
-	if err != nil {
-		ctx.responseWriter.WriteHeader(500)
-		return err
-	}
-	ctx.responseWriter.Write(byt)
-	return nil
 }

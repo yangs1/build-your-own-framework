@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"framework"
+	"time"
 )
 
 func registerRouter(core *framework.Core) {
@@ -22,7 +23,7 @@ func registerRouter(core *framework.Core) {
 
 	dgroup.Get("f", func(c *framework.Context) error {
 		fmt.Println("int /ccc/ddd/f")
-
+		time.Sleep(10 * time.Second)
 		return c.Json(200, "/ccc/ddd/fff")
 	})
 }

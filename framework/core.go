@@ -32,6 +32,7 @@ func (c *Core) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	handler := routeNode.handler
 	middlewares := routeNode.middlewares
 
+	// 实现 pipeline 链
 	ctx.setHandlers(append(middlewares, handler))
 
 	// 调用路由函数，如果返回err 代表存在内部错误，返回500状态码
