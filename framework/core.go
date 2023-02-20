@@ -25,7 +25,7 @@ func (c *Core) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if routeNode == nil {
 		// 如果没有找到，这里打印日志
-		ctx.Json(404, "not found")
+		ctx.SetStatus(404).Json("not found")
 		return
 	}
 
@@ -37,7 +37,7 @@ func (c *Core) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// 调用路由函数，如果返回err 代表存在内部错误，返回500状态码
 	if err := ctx.Next(); err != nil {
-		ctx.Json(500, "inner error")
+		ctx.SetStatus(500).Json("inner error")
 		return
 	}
 }

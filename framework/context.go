@@ -2,7 +2,6 @@ package framework
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"sync"
 	"time"
@@ -19,6 +18,8 @@ type Context struct {
 
 	handlers []ControllerHandler
 	index    int
+
+	params map[string]string // url路由匹配的参数
 }
 
 func NewContext(w http.ResponseWriter, r *http.Request) *Context {
@@ -65,22 +66,6 @@ func (ctx *Context) SetHasTimeout() {
 
 func (ctx *Context) HasTimeout() bool {
 	return ctx.hasTimeout
-}
-
-func (ctx Context) Json(status int, obj interface{}) error {
-	if ctx.HasTimeout() {
-		//todo
-		return nil
-	}
-	ctx.responseWriter.Header().Set("Content-Type", "application/json")
-	ctx.responseWriter.WriteHeader(status)
-	byt, err := json.Marshal(obj)
-	if err != nil {
-		ctx.responseWriter.WriteHeader(500)
-		return err
-	}
-	ctx.responseWriter.Write(byt)
-	return nil
 }
 
 func (ctx *Context) BaseContext() context.Context {

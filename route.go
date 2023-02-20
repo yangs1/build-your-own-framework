@@ -11,7 +11,8 @@ func registerRouter(core *framework.Core) {
 
 	bgourp := core.Group("b")
 	bgourp.Get("/ccc", func(c *framework.Context) error {
-		return c.Json(200, "halow world")
+		c.Json("halow world")
+		return nil
 	})
 
 	dgroup := bgourp.Group("ddd")
@@ -22,8 +23,9 @@ func registerRouter(core *framework.Core) {
 	})
 
 	dgroup.Get("f", func(c *framework.Context) error {
-		fmt.Println("int /ccc/ddd/f")
 		time.Sleep(10 * time.Second)
-		return c.Json(200, "/ccc/ddd/fff")
+		fmt.Println("int /ccc/ddd/f")
+		c.SetStatus(200).Json("/ccc/ddd/fff")
+		return nil
 	})
 }
