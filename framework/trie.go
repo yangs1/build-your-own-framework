@@ -13,6 +13,7 @@ type node struct {
 	isLast  bool   // 该节点是否能成为一个独立的uri, 是否自身就是一个终极节点
 	segment string // uri中的字符串
 	childs  []*node
+	parent  *node // 父节点，双向指针
 
 	handler     ControllerHandler
 	middlewares []ControllerHandler
@@ -95,6 +96,29 @@ func (n *node) matchNode(url string) *node {
 	return nil
 }
 
+func (n *node) parseParamsFromEndNode(uri string) map[string]string {
+	ret := map[string]string{}
+
+	segments := strings.Split(strings.Trim(uri, "/"), "/")
+
+	cnt := len(segments)
+	cur := n
+
+	for i := cnt - 1; i > 0; i-- {
+		if cur.segment == "" {
+			break
+		}
+		// 如果是通配符节点
+		if isWildSegment(cur.segment) {
+			// 设置params
+			ret[cur.segment[1:]] = segments[i]
+		}
+		cur = cur.parent
+	}
+
+	return ret
+}
+
 // AddRouter 增加路由节点, 路由节点有先后顺序
 /*
 /book/list
@@ -138,6 +162,8 @@ func (tree *Tree) AddRouter(uri string, handler ControllerHandler, middlewares [
 			// 创建一个当前node的节点
 			cnode := newNode()
 			cnode.segment = segment
+			cnode.parent = n
+
 			if isLast {
 				cnode.isLast = true
 				cnode.handler = handler

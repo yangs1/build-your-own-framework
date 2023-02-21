@@ -33,7 +33,9 @@ func (c *Core) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	handler := routeNode.handler
 	middlewares := routeNode.middlewares
-
+	params := routeNode.parseParamsFromEndNode(r.URL.Path)
+	// 注入参数
+	ctx.SetParams(params)
 	// 实现 pipeline 链
 	ctx.setHandlers(append(middlewares, handler))
 

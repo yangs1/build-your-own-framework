@@ -8,6 +8,7 @@ import (
 
 func registerRouter(core *framework.Core) {
 	core.Get("foo", FooControllerHandler)
+	core.Get("foo/:id/ccc/:a", FooControllerHandler)
 
 	bgourp := core.Group("b")
 	bgourp.Get("/ccc", func(c *framework.Context) error {
