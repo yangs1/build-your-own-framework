@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"framework"
 	"framework/middlewares"
 	"log"
@@ -28,7 +27,7 @@ func main() {
 	}
 	// 这个goroutine是启动服务的goroutine
 	go func() {
-		log.Fatal(server.ListenAndServe())
+		log.Println(server.ListenAndServe())
 	}()
 
 	// 当前的goroutine等待信号量
@@ -38,17 +37,12 @@ func main() {
 	// 这里会阻塞当前goroutine等待信号
 	<-quit
 
-	fmt.Println("666777")
 	// 调用Server.Shutdown graceful结束
 	timeoutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	log.Println(timeoutCtx)
-
 	defer cancel()
 
-	err := server.Shutdown(timeoutCtx)
-	log.Println(err)
-	if err != nil {
+	if err := server.Shutdown(timeoutCtx); err != nil {
 		log.Fatal("Server Shutdown:", err)
 	}
-	log.Println("666")
+	log.Println("ok")
 }
