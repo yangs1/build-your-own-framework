@@ -1,8 +1,10 @@
 package framework
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"runtime"
 	"strings"
 )
 
@@ -18,7 +20,7 @@ func NewCore() *Core {
 }
 
 func (c *Core) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println("core.serveHTTP")
+	//log.Println("core.serveHTTP")
 	ctx := NewContext(w, r)
 
 	routeNode := c.FindRouteByRequest(r)
@@ -38,8 +40,11 @@ func (c *Core) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// 调用路由函数，如果返回err 代表存在内部错误，返回500状态码
 	if err := ctx.Next(); err != nil {
 		ctx.SetStatus(500).Json("inner error")
+		fmt.Println("number of goroutines:", runtime.NumGoroutine())
 		return
 	}
+	fmt.Println("number of goroutines:", runtime.NumGoroutine())
+
 }
 
 func (c *Core) FindRouteByRequest(request *http.Request) *node {
@@ -48,8 +53,8 @@ func (c *Core) FindRouteByRequest(request *http.Request) *node {
 
 	upperMethod := strings.ToUpper(method)
 
-	log.Println(upperMethod)
-	log.Println(c.router)
+	//log.Println(upperMethod)
+	//log.Println(c.router)
 	if methodTree, ok := c.router[upperMethod]; ok {
 		return methodTree.FindHandler(url)
 	}

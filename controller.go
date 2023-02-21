@@ -2,11 +2,14 @@ package main
 
 import (
 	"framework"
+	"time"
 )
 
 func FooControllerHandler(c *framework.Context) error {
-	json := map[string]string{"sd": "123"}
-
-	c.SetStatus(200).Json(json)
+	foo, _ := c.QueryString("foo", "def")
+	// 等待10s才结束执行
+	time.Sleep(10 * time.Second)
+	// 输出结果
+	c.SetOkStatus().Json("ok, UserLoginController: " + foo)
 	return nil
 }
