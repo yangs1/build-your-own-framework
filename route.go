@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"framework"
+	"framework/contract"
 	"time"
 )
 
@@ -11,10 +12,22 @@ func registerRouter(core *framework.Core) {
 	core.Get("foo/:id/ccc/:a", FooControllerHandler)
 
 	bgourp := core.Group("b")
-	bgourp.Get("/ccc", func(c *framework.Context) error {
-		c.Json("halow world")
-		return nil
-	})
+	{
+		bgourp.Get("/ccc", func(c *framework.Context) error {
+			app, err := c.Make(contract.AppKey)
+
+			if err == nil {
+				app, ok := app.(contract.App)
+
+				if ok {
+					c.Json(app.BaseFolder())
+					return nil
+				}
+			}
+			c.Json("halow world")
+			return nil
+		})
+	}
 
 	dgroup := bgourp.Group("ddd")
 	dgroup.Use(func(c *framework.Context) error {

@@ -3,6 +3,9 @@ package framework
 import (
 	"context"
 	"fmt"
+	"framework/contract"
+	"framework/provider/app"
+	"log"
 	"runtime"
 	"sync"
 	"testing"
@@ -54,4 +57,12 @@ func requestWork(ctx context.Context) error {
 		fmt.Println("ctx time up", ctx.Value("key"))
 		return nil
 	}
+}
+
+func TestProvider(t *testing.T) {
+	container := NewLsfContainer()
+	container.Bind(&app.LsfAppProvider{})
+
+	lsfapp := container.MustMake(contract.AppKey).(contract.App)
+	log.Println(lsfapp.BaseFolder())
 }

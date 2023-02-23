@@ -4,6 +4,7 @@ import (
 	"context"
 	"framework"
 	"framework/middlewares"
+	"framework/provider/app"
 	"log"
 	"net/http"
 	"os"
@@ -14,6 +15,9 @@ import (
 
 func main() {
 	core := framework.NewCore()
+
+	// 绑定具体的服务
+	core.Bind(&app.LsfAppProvider{})
 
 	core.Use(middlewares.Recovery())
 	core.Use(middlewares.Cost())

@@ -9,19 +9,21 @@ import (
 )
 
 type Core struct {
+	container   Container
 	router      map[string]*Tree
 	middlewares []ControllerHandler
 }
 
 func NewCore() *Core {
 	return &Core{
-		router: make(map[string]*Tree),
+		container: NewLsfContainer(),
+		router:    make(map[string]*Tree),
 	}
 }
 
 func (c *Core) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	//log.Println("core.serveHTTP")
-	ctx := NewContext(w, r)
+	ctx := NewContext(w, r, c)
 
 	routeNode := c.FindRouteByRequest(r)
 
@@ -99,4 +101,14 @@ func (c *Core) Use(middlewares ...ControllerHandler) {
 
 func (c *Core) Group(prefix string) IGroup {
 	return NewGroup(c, prefix)
+}
+
+// engine实现container的绑定封装
+func (core *Core) Bind(provider ServiceProvider) error {
+	return core.container.Bind(provider)
+}
+
+// IsBind 关键字凭证是否已经绑定服务提供者
+func (core *Core) IsBind(key string) bool {
+	return core.container.IsBind(key)
 }

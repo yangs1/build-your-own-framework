@@ -8,6 +8,7 @@ import (
 )
 
 type Context struct {
+	container      Container
 	request        *http.Request
 	responseWriter http.ResponseWriter
 	//ctx            context.Context
@@ -22,13 +23,15 @@ type Context struct {
 	params map[string]string // url路由匹配的参数
 }
 
-func NewContext(w http.ResponseWriter, r *http.Request) *Context {
+func NewContext(w http.ResponseWriter, r *http.Request, c *Core) *Context {
 	return &Context{
 		request:        r,
 		responseWriter: w,
 		//ctx:            r.Context(),
 		writerMux: &sync.Mutex{},
 		index:     -1,
+		container: c.container,
+		//handlers:  make([]ControllerHandler, 0),
 	}
 }
 
@@ -91,4 +94,16 @@ func (ctx *Context) Err() error {
 
 func (ctx *Context) Value(key interface{}) interface{} {
 	return ctx.BaseContext().Value(key)
+}
+
+// context 实现container的几个封装
+
+// 实现make的封装
+func (ctx *Context) Make(key string) (interface{}, error) {
+	return ctx.container.Make(key)
+}
+
+// 实现mustMake的封装
+func (ctx *Context) MustMake(key string) interface{} {
+	return ctx.container.MustMake(key)
 }
