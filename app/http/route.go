@@ -1,4 +1,4 @@
-package main
+package http
 
 import (
 	"fmt"
@@ -8,8 +8,8 @@ import (
 )
 
 func registerRouter(core *framework.Core) {
-	core.Get("foo", FooControllerHandler)
-	core.Get("foo/:id/ccc/:a", FooControllerHandler)
+	//	core.Get("foo", FooControllerHandler)
+	//	core.Get("foo/:id/ccc/:a", main.FooControllerHandler)
 
 	bgourp := core.Group("b")
 	{

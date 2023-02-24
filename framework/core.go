@@ -14,7 +14,7 @@ type Core struct {
 	middlewares []ControllerHandler
 }
 
-func NewCore() *Core {
+func New() *Core {
 	return &Core{
 		container: NewLsfContainer(),
 		router:    make(map[string]*Tree),
@@ -111,4 +111,8 @@ func (core *Core) Bind(provider ServiceProvider) error {
 // IsBind 关键字凭证是否已经绑定服务提供者
 func (core *Core) IsBind(key string) bool {
 	return core.container.IsBind(key)
+}
+
+func (core *Core) SetContainer(container Container) {
+	core.container = container
 }

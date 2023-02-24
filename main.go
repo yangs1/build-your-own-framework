@@ -1,20 +1,27 @@
 package main
 
 import (
-	"context"
 	"framework"
-	"framework/middlewares"
 	"framework/provider/app"
-	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
+	"framework/provider/kernel"
+	"golsf/app/console"
+	"golsf/app/http"
 )
 
 func main() {
-	core := framework.NewCore()
+
+	// 初始化服务容器
+	container := framework.NewLsfContainer()
+	// 绑定App服务提供者
+	container.Bind(&app.LsfAppProvider{})
+
+	if r, err := http.NewHttpEngine(); err == nil {
+		container.Bind(&kernel.KernelProvider{Core: r})
+	}
+
+	// 运行root命令
+	console.RunCommand(container)
+	/*core := framework.NewCore()
 
 	// 绑定具体的服务
 	core.Bind(&app.LsfAppProvider{})
@@ -48,5 +55,5 @@ func main() {
 	if err := server.Shutdown(timeoutCtx); err != nil {
 		log.Fatal("Server Shutdown:", err)
 	}
-	log.Println("ok")
+	log.Println("ok")*/
 }
