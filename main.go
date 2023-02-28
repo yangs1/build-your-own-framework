@@ -3,6 +3,7 @@ package main
 import (
 	"framework"
 	"framework/provider/app"
+	"framework/provider/config"
 	"framework/provider/kernel"
 	"golsf/app/console"
 	"golsf/app/http"
@@ -14,6 +15,7 @@ func main() {
 	container := framework.NewLsfContainer()
 	// 绑定App服务提供者
 	container.Bind(&app.LsfAppProvider{})
+	container.Bind(&config.ConfigProvider{})
 
 	if r, err := http.NewHttpEngine(); err == nil {
 		container.Bind(&kernel.KernelProvider{Core: r})
