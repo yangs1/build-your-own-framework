@@ -11,6 +11,8 @@ import (
 type LsfApp struct {
 	container  framework.Container //服务容器
 	baseFolder string              // 基础路径
+
+	configMap map[string]string // 配置加载
 }
 
 func (app LsfApp) Version() string {
@@ -93,5 +95,13 @@ func NewLsfApp(params ...interface{}) (interface{}, error) {
 	// 有两个参数，一个是容器，一个是baseFolder
 	container := params[0].(framework.Container)
 	baseFolder := params[1].(string)
-	return &LsfApp{baseFolder: baseFolder, container: container}, nil
+	configMap := make(map[string]string)
+	return &LsfApp{baseFolder: baseFolder, container: container, configMap: configMap}, nil
+}
+
+// LoadAppConfig 加载配置map
+func (app *LsfApp) LoadAppConfig(kv map[string]string) {
+	for key, val := range kv {
+		app.configMap[key] = val
+	}
 }
